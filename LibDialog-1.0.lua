@@ -24,7 +24,7 @@ local MAJOR = "LibDialog-1.0"
 
 _G.assert(LibStub, MAJOR .. " requires LibStub")
 
-local MINOR = 10 -- Should be manually increased
+local MINOR = 11 -- Should be manually increased
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then
@@ -264,6 +264,11 @@ local function _Dialog_OnHide(dialog)
     _RecycleWidget(dialog, active_dialogs, dialog_heap)
 
     local delegate = dialog.delegate
+
+    if not delegate then
+        return
+    end
+
     if delegate.on_hide then
         delegate.on_hide(dialog, dialog.data)
     end
