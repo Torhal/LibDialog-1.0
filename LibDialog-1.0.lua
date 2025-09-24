@@ -24,7 +24,7 @@ local MAJOR = "LibDialog-1.0"
 
 _G.assert(LibStub, MAJOR .. " requires LibStub")
 
-local MINOR = 11 -- Should be manually increased
+local MINOR = 12 -- Should be manually increased
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then
@@ -124,13 +124,18 @@ local editbox_heap = lib.editbox_heap
 -----------------------------------------------------------------------
 -- Helper functions.
 -----------------------------------------------------------------------
--- May 7th 2024, 1.15.2 and other clients still diverge on StaticPopup_DisplayedFrames / StaticPopup_HasDisplayedFrames
--- so we still need both to find the last StaticPopup for anchoring
+-- Sept 24th 2025, Mists Classic 5.5.1 *sigh* Blizz
 local function _SetupAnchor(dialog)
     local default_dialog
     if _G.StaticPopup_DisplayedFrames then
         default_dialog = _G.StaticPopup_DisplayedFrames[#_G.StaticPopup_DisplayedFrames]
-    elseif (_G.StaticPopup_HasDisplayedFrames and _G.StaticPopup_IsLastDisplayedFrame) then
+    elseif (_G.StaticPopup_ForEachShownDialog and _G.StaticPopup_IsLastDisplayedFrame) then
+        StaticPopup_ForEachShownDialog(function(dialog)
+            if StaticPopup_IsLastDisplayedFrame(dialog) then
+                default_dialog = dialog
+            end
+        end)
+    elseif (_G.StaticPopup_HasDisplayedFrames and _G.StaticPopup_IsLastDisplayedFrame and _G.STATICPOPUP_NUMDIALOGS) then
         if StaticPopup_HasDisplayedFrames() then
             for idx = STATICPOPUP_NUMDIALOGS,1,-1 do
                 local test_dialog = _G["StaticPopup"..idx]
