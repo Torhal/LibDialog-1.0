@@ -1,46 +1,31 @@
---- **LibDialog-1.0** provides methods for creating dialogs similar to Blizzard's default StaticPopup dialogs,
--- with additions (such as multiple CheckButtons) and improvements (such as multiple EditBoxes, frame and widget
--- recycling, and not tainting default UI elements).
--- @class file
--- @name LibDialog-1.0.lua
--- @release 1
+--------------------------------------------------------------------------------
+---- Library Namespace
+--------------------------------------------------------------------------------
 
------------------------------------------------------------------------
--- Upvalued Lua API.
------------------------------------------------------------------------
--- Functions
-local error = _G.error
-local pairs = _G.pairs
-local tonumber = _G.tonumber
+local Version = {
+    Major = "LibDialog-1.0",
+    Minor = 9,
+}
 
--- Libraries
-local table = _G.table
+assert(LibStub, ("%s requires LibStub"):format(Version.Major))
 
------------------------------------------------------------------------
--- Library namespace.
------------------------------------------------------------------------
-local LibStub = _G.LibStub
-local MAJOR = "LibDialog-1.0"
-
-_G.assert(LibStub, MAJOR .. " requires LibStub")
-
-local MINOR = 8 -- Should be manually increased
-local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+---@class LibDialog-1.0
+local lib, oldMinor = LibStub:NewLibrary(Version.Major, Version.Minor)
 
 if not lib then
     return
 end -- No upgrade needed
 
-local dialog_prototype = _G.CreateFrame("Frame", nil, _G.UIParent, _G.BackdropTemplateMixin and "BackdropTemplate")
+local dialog_prototype = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 local dialog_meta = {
-    __index = dialog_prototype
+    __index = dialog_prototype,
 }
 
------------------------------------------------------------------------
--- Migrations.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Migrations
+--------------------------------------------------------------------------------
 lib.delegates = lib.delegates or {}
-lib.queued_delegates = lib.queues_delegates or {}
+lib.queued_delegates = lib.queued_delegates or {}
 lib.delegate_queue = lib.delegate_queue or {}
 
 lib.active_dialogs = lib.active_dialogs or {}
@@ -148,12 +133,12 @@ local function _RefreshDialogAnchors()
         current_dialog:ClearAllPoints()
 
         if index == 1 then
-            local default_dialog = _G.StaticPopup_DisplayedFrames[#_G.StaticPopup_DisplayedFrames]
+            local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
 
             if default_dialog then
                 current_dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
             else
-                current_dialog:SetPoint("TOP", _G.UIParent, "TOP", 0, -135)
+                current_dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
             end
         else
             current_dialog:SetPoint("TOP", active_dialogs[index - 1], "BOTTOM", 0, 0)
@@ -233,7 +218,7 @@ local function _Dialog_OnShow(dialog)
         return
     end
 
-    _G.PlaySound(SOUNDKIT.IG_MAINMENU_OPEN, "Master")
+    PlaySound(SOUNDKIT.IG_MAINMENU_OPEN, "Master")
 
     if delegate.on_show then
         delegate.on_show(dialog, dialog.data)
@@ -241,7 +226,7 @@ local function _Dialog_OnShow(dialog)
 end
 
 local function _Dialog_OnHide(dialog)
-    _G.PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE, "Master")
+    PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE, "Master")
 
     -- Required so lib:ActiveDialog() will return false if called from code which is called from the delegate's on_hide
     _RecycleWidget(dialog, active_dialogs, dialog_heap)
@@ -291,7 +276,7 @@ local function _Dialog_OnEvent(self, event, ...)
 end
 
 if not lib.hooked_onhide then
-    _G.hooksecurefunc("StaticPopup_OnHide", function()
+    hooksecurefunc("StaticPopup_OnHide", function()
         _RefreshDialogAnchors()
 
         if #delegate_queue > 0 then
@@ -305,7 +290,7 @@ if not lib.hooked_onhide then
 end
 
 if not lib.hooked_set_up_position then
-    _G.hooksecurefunc("StaticPopup_SetUpPosition", function()
+    hooksecurefunc("StaticPopup_SetUpPosition", function()
         _RefreshDialogAnchors()
     end)
     lib.hooked_set_up_position = true
@@ -314,7 +299,7 @@ end
 if not lib.hooked_escape_pressed then
     local dialogs_to_release = {}
 
-    _G.hooksecurefunc("StaticPopup_EscapePressed", function()
+    hooksecurefunc("StaticPopup_EscapePressed", function()
         table.wipe(dialogs_to_release)
 
         for index = 1, #active_dialogs do
@@ -367,10 +352,16 @@ local function _AcquireCheckBox(parent, index)
     local checkbox = table.remove(checkbox_heap)
 
     if not checkbox then
-        local container = _G.CreateFrame("Frame", ("%s_CheckBoxContainer%d"):format(MAJOR, #active_checkboxes + 1), _G.UIParent)
+        local container =
+            CreateFrame("Frame", ("%s_CheckBoxContainer%d"):format(MAJOR, #active_checkboxes + 1), UIParent)
         container:SetHeight(DEFAULT_CHECKBOX_SIZE)
 
-        checkbox = _G.CreateFrame("CheckButton", ("%s_CheckBox%d"):format(MAJOR, #active_checkboxes + 1), container, "UICheckButtonTemplate")
+        checkbox = CreateFrame(
+            "CheckButton",
+            ("%s_CheckBox%d"):format(MAJOR, #active_checkboxes + 1),
+            container,
+            "UICheckButtonTemplate"
+        )
         checkbox:SetScript("OnClick", CheckBox_OnClick)
 
         checkbox.container = container
@@ -388,7 +379,7 @@ local function _AcquireCheckBox(parent, index)
 end
 
 local function EditBox_OnEnterPressed(editbox)
-    if not editbox.autoCompleteParams or not _G.AutoCompleteEditBox_OnEnterPressed(editbox) then
+    if not editbox.autoCompleteParams or not AutoCompleteEditBox_OnEnterPressed(editbox) then
         local dialog = editbox:GetParent()
         local on_enter_pressed = dialog.delegate.editboxes[editbox:GetID()].on_enter_pressed
 
@@ -417,7 +408,7 @@ local function EditBox_OnShow(editbox)
 end
 
 local function EditBox_OnTextChanged(editbox, user_input)
-    if not editbox.autoCompleteParams or not _G.AutoCompleteEditBox_OnTextChanged(editbox, user_input) then
+    if not editbox.autoCompleteParams or not AutoCompleteEditBox_OnTextChanged(editbox, user_input) then
         local dialog = editbox:GetParent()
         local on_text_changed = dialog.delegate.editboxes[editbox:GetID()].on_text_changed
 
@@ -433,7 +424,7 @@ local function _AcquireEditBox(dialog, index)
     if not editbox then
         local editbox_name = ("%s_EditBox%d"):format(MAJOR, #active_editboxes + 1)
 
-        editbox = _G.CreateFrame("EditBox", editbox_name, _G.UIParent, "AutoCompleteEditBoxTemplate")
+        editbox = CreateFrame("EditBox", editbox_name, UIParent, "AutoCompleteEditBoxTemplate")
         editbox:SetWidth(130)
         editbox:SetHeight(32)
         editbox:SetFontObject("ChatFontNormal")
@@ -518,7 +509,7 @@ local function _AcquireButton(parent, index)
 
     if not button then
         local button_name = ("%s_Button%d"):format(MAJOR, #active_buttons + 1)
-        button = _G.CreateFrame("Button", button_name, _G.UIParent)
+        button = CreateFrame("Button", button_name, UIParent)
         button:SetWidth(DEFAULT_BUTTON_WIDTH)
         button:SetHeight(DEFAULT_BUTTON_HEIGHT)
 
@@ -561,10 +552,13 @@ local function _BuildDialog(delegate, data)
     local dialog = table.remove(dialog_heap)
 
     if not dialog then
-        dialog = _G.setmetatable(_G.CreateFrame("Frame", ("%s_Dialog%d"):format(MAJOR, #active_dialogs + 1), _G.UIParent), dialog_meta)
+        dialog = setmetatable(
+            CreateFrame("Frame", ("%s_Dialog%d"):format(MAJOR, #active_dialogs + 1), UIParent),
+            dialog_meta
+        )
         dialog.is_new = true
 
-        local close_button = _G.CreateFrame("Button", nil, dialog, "UIPanelCloseButton")
+        local close_button = CreateFrame("Button", nil, dialog, "UIPanelCloseButton")
         close_button:SetPoint("TOPRIGHT", -3, -3)
         close_button:Hide()
 
@@ -590,7 +584,7 @@ local function _BuildDialog(delegate, data)
         dialog.close_button:Show()
     end
 
-    if _G.type(delegate.icon) == "string" then
+    if type(delegate.icon) == "string" then
         if not dialog.icon then
             dialog.icon = dialog:CreateTexture(("%sIcon"):format(dialog:GetName()), "ARTWORK")
             dialog.icon:SetPoint("LEFT", dialog, "LEFT", 16, 0)
@@ -711,18 +705,18 @@ end
 -- @param delegate_name The name the delegate table will be registered under.
 -- @param delegate The delegate table definition.
 function lib:Register(delegate_name, delegate)
-    if _G.type(delegate_name) ~= "string" or delegate_name == "" then
+    if type(delegate_name) ~= "string" or delegate_name == "" then
         error(METHOD_USAGE_FORMAT:format("Register", "delegate_name must be a non-empty string"), 2)
     end
 
-    if _G.type(delegate) ~= "table" then
+    if type(delegate) ~= "table" then
         error(METHOD_USAGE_FORMAT:format("Register", "delegate must be a table"), 2)
     end
     delegates[delegate_name] = delegate
 end
 
 local function _FindDelegate(method_name, reference)
-    local reference_type = _G.type(reference)
+    local reference_type = type(reference)
 
     if reference == "" or (reference_type ~= "string" and reference_type ~= "table") then
         error(METHOD_USAGE_FORMAT:format(method_name, "reference must be a delegate table or a non-empty string"), 3)
@@ -752,14 +746,14 @@ function lib:Spawn(reference, data)
     -----------------------------------------------------------------------
     -- Check delegate conditionals before building.
     -----------------------------------------------------------------------
-    if _G.UnitIsDeadOrGhost("player") and not delegate.show_while_dead then
+    if UnitIsDeadOrGhost("player") and not delegate.show_while_dead then
         if delegate.on_cancel then
             delegate.on_cancel()
         end
         return
     end
 
-    if _G.InCinematic() and not delegate.show_during_cinematic then
+    if InCinematic() and not delegate.show_during_cinematic then
         if delegate.on_cancel then
             delegate.on_cancel()
         end
@@ -823,19 +817,19 @@ function lib:Spawn(reference, data)
     end
 
     if delegate.sound then
-        _G.PlaySound(delegate.sound)
+        PlaySound(delegate.sound)
     end
 
     -- Anchor to the bottom of existing dialogs. If none exist, check to see if there are visible default StaticPopupDialogs and anchor to that instead; else, anchor to UIParent.
     if #active_dialogs > 0 then
         dialog:SetPoint("TOP", active_dialogs[#active_dialogs], "BOTTOM", 0, 0)
     else
-        local default_dialog = _G.StaticPopup_DisplayedFrames[#_G.StaticPopup_DisplayedFrames]
+        local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
 
         if default_dialog then
             dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
         else
-            dialog:SetPoint("TOP", _G.UIParent, "TOP", 0, -135)
+            dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
         end
     end
     active_dialogs[#active_dialogs + 1] = dialog
