@@ -575,8 +575,12 @@ local function _BuildDialog(delegate, data)
     dialog.data = data
 
     dialog.text:SetText(delegate.text or "")
-    dialog.text:SetJustifyH(delegate.text_justify_h and TEXT_HORIZONTAL_JUSTIFICATIONS[delegate.text_justify_h:upper()] or "CENTER")
-    dialog.text:SetJustifyV(delegate.text_justify_v and TEXT_VERTICAL_JUSTIFICATIONS[delegate.text_justify_v:upper()] or "MIDDLE")
+    dialog.text:SetJustifyH(
+        delegate.text_justify_h and TEXT_HORIZONTAL_JUSTIFICATIONS[delegate.text_justify_h:upper()] or "CENTER"
+    )
+    dialog.text:SetJustifyV(
+        delegate.text_justify_v and TEXT_VERTICAL_JUSTIFICATIONS[delegate.text_justify_v:upper()] or "MIDDLE"
+    )
 
     if delegate.no_close_button then
         dialog.close_button:Hide()
@@ -725,7 +729,10 @@ local function _FindDelegate(method_name, reference)
 
     if reference_type == "string" then
         if not delegates[reference] then
-            error(METHOD_USAGE_FORMAT:format(method_name, ("\"%s\" does not match a registered delegate"):format(reference)), 3)
+            error(
+                METHOD_USAGE_FORMAT:format(method_name, ('"%s" does not match a registered delegate'):format(reference)),
+                3
+            )
         end
         delegate = delegates[reference]
     else
@@ -792,7 +799,7 @@ function lib:Spawn(reference, data)
                     end
                 end
             else
-                error(("\"%s\" does not match a registered delegate - unable to cancel"):format(delegate_name), 2)
+                error(('"%s" does not match a registered delegate - unable to cancel'):format(delegate_name), 2)
             end
         end
     end
