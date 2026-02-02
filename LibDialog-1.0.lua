@@ -24,6 +24,7 @@ local dialog_meta = {
 --------------------------------------------------------------------------------
 ---- Migrations
 --------------------------------------------------------------------------------
+
 lib.delegates = lib.delegates or {}
 lib.queued_delegates = lib.queued_delegates or {}
 lib.delegate_queue = lib.delegate_queue or {}
@@ -40,10 +41,11 @@ lib.checkbox_heap = lib.checkbox_heap or {}
 lib.editbox_heap = lib.editbox_heap or {}
 lib.icon_heap = lib.icon_heap or {}
 
------------------------------------------------------------------------
--- Constants.
------------------------------------------------------------------------
-local METHOD_USAGE_FORMAT = MAJOR .. ":%s() - %s."
+--------------------------------------------------------------------------------
+---- Constants
+--------------------------------------------------------------------------------
+
+local METHOD_USAGE_FORMAT = Version.Major .. ":%s() - %s."
 
 local DEFAULT_DIALOG_WIDTH = 320
 local DEFAULT_DIALOG_HEIGHT = 72
@@ -89,9 +91,10 @@ local TEXT_VERTICAL_JUSTIFICATIONS = {
     TOP = "TOP",
 }
 
------------------------------------------------------------------------
--- Upvalues.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Upvalues
+--------------------------------------------------------------------------------
+
 local delegates = lib.delegates
 local queued_delegates = lib.queued_delegates
 local delegate_queue = lib.delegate_queue
@@ -106,9 +109,10 @@ local button_heap = lib.button_heap
 local checkbox_heap = lib.checkbox_heap
 local editbox_heap = lib.editbox_heap
 
------------------------------------------------------------------------
--- Helper functions.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Helpers
+--------------------------------------------------------------------------------
+
 local function _ProcessQueue()
     if #active_dialogs == MAX_DIALOGS then
         return
@@ -353,12 +357,12 @@ local function _AcquireCheckBox(parent, index)
 
     if not checkbox then
         local container =
-            CreateFrame("Frame", ("%s_CheckBoxContainer%d"):format(MAJOR, #active_checkboxes + 1), UIParent)
+            CreateFrame("Frame", ("%s_CheckBoxContainer%d"):format(Version.Major, #active_checkboxes + 1), UIParent)
         container:SetHeight(DEFAULT_CHECKBOX_SIZE)
 
         checkbox = CreateFrame(
             "CheckButton",
-            ("%s_CheckBox%d"):format(MAJOR, #active_checkboxes + 1),
+            ("%s_CheckBox%d"):format(Version.Major, #active_checkboxes + 1),
             container,
             "UICheckButtonTemplate"
         )
@@ -422,7 +426,7 @@ local function _AcquireEditBox(dialog, index)
     local editbox = table.remove(editbox_heap)
 
     if not editbox then
-        local editbox_name = ("%s_EditBox%d"):format(MAJOR, #active_editboxes + 1)
+        local editbox_name = ("%s_EditBox%d"):format(Version.Major, #active_editboxes + 1)
 
         editbox = CreateFrame("EditBox", editbox_name, UIParent, "AutoCompleteEditBoxTemplate")
         editbox:SetWidth(130)
@@ -508,7 +512,7 @@ local function _AcquireButton(parent, index)
     local button = table.remove(button_heap)
 
     if not button then
-        local button_name = ("%s_Button%d"):format(MAJOR, #active_buttons + 1)
+        local button_name = ("%s_Button%d"):format(Version.Major, #active_buttons + 1)
         button = CreateFrame("Button", button_name, UIParent)
         button:SetWidth(DEFAULT_BUTTON_WIDTH)
         button:SetHeight(DEFAULT_BUTTON_HEIGHT)
@@ -553,7 +557,7 @@ local function _BuildDialog(delegate, data)
 
     if not dialog then
         dialog = setmetatable(
-            CreateFrame("Frame", ("%s_Dialog%d"):format(MAJOR, #active_dialogs + 1), UIParent),
+            CreateFrame("Frame", ("%s_Dialog%d"):format(Version.Major, #active_dialogs + 1), UIParent),
             dialog_meta
         )
         dialog.is_new = true
@@ -699,9 +703,9 @@ local function _BuildDialog(delegate, data)
     return dialog
 end
 
------------------------------------------------------------------------
--- Library methods.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Library Methods
+--------------------------------------------------------------------------------
 --- Register a new dialog delegate.
 -- @name LibDialog-1.0:Register
 -- @class function
@@ -814,9 +818,7 @@ function lib:Spawn(reference, data)
         dialog:Hide()
     end
 
-    -----------------------------------------------------------------------
     -- Build new dialog and anchor it.
-    -----------------------------------------------------------------------
     dialog = _BuildDialog(delegate, data)
 
     if not dialog then
@@ -886,9 +888,9 @@ function lib:Dismiss(reference, data)
     end
 end
 
------------------------------------------------------------------------
--- Dialog methods.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Dialog Methods
+--------------------------------------------------------------------------------
 function dialog_prototype:Reset()
     self:SetWidth(DEFAULT_DIALOG_WIDTH)
     self:SetHeight(DEFAULT_DIALOG_HEIGHT)
@@ -984,9 +986,9 @@ function dialog_prototype:Resize()
     self:SetHeight(height)
 end
 
------------------------------------------------------------------------
--- Default dialog events.
------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Dialog Events
+--------------------------------------------------------------------------------
 function dialog_prototype:DISPLAY_SIZE_CHANGED()
     self:Resize()
 end
