@@ -5,7 +5,11 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "Lua.diagnostics.globals": [
-        "SOUNDKIT"
+        "SOUNDKIT",
+        "UIParent",
+        "BackdropTemplateMixin",
+        "AutoCompleteEditBox_OnEnterPressed",
+        "AutoCompleteEditBox_OnTextChanged"
     ],
     "Lua.runtime.builtin": {
         "basic": "disable",
@@ -20,8 +24,10 @@
     },
     "Lua.runtime.version": "Lua 5.1",
     "Lua.workspace.library": [
-        "~/.vscode/extensions/ketho.wow-api-0.21.0/Annotations/Core",
-        "~/.vscode/extensions/ketho.wow-api-0.21.0/Annotations/FrameXML"
+        "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/Core",
+        "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML"
     ],
-    "stylua.targetReleaseVersion": "latest"
+    "stylua.targetReleaseVersion": "latest",
+    "cSpell.words": ["editbox", "editboxes", "hooksecurefunc", "onhide"],
+    "Lua.diagnostics.disable": ["assign-type-mismatch"]
 }
