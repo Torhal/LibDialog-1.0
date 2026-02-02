@@ -16,6 +16,15 @@ if not lib then
     return
 end -- No upgrade needed
 
+local dialog_prototype = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
+local dialog_meta = {
+    __index = dialog_prototype,
+}
+
+--------------------------------------------------------------------------------
+---- Migrations
+--------------------------------------------------------------------------------
+
 lib.delegates = lib.delegates or {}
 lib.queued_delegates = lib.queued_delegates or {}
 lib.delegate_queue = lib.delegate_queue or {}
@@ -868,14 +877,8 @@ function lib:Dismiss(reference, data)
 end
 
 --------------------------------------------------------------------------------
----- Dialog
+---- Dialog Methods
 --------------------------------------------------------------------------------
-
-local dialog_prototype = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
-local dialog_meta = {
-    __index = dialog_prototype,
-}
-
 function dialog_prototype:Reset()
     self:SetWidth(DEFAULT_DIALOG_WIDTH)
     self:SetHeight(DEFAULT_DIALOG_HEIGHT)
