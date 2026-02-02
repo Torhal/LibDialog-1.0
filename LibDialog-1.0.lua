@@ -137,13 +137,7 @@ local function _RefreshDialogAnchors()
         current_dialog:ClearAllPoints()
 
         if index == 1 then
-            local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
-
-            if default_dialog then
-                current_dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
-            else
-                current_dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
-            end
+            current_dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
         else
             current_dialog:SetPoint("TOP", active_dialogs[index - 1], "BOTTOM", 0, 0)
         end
@@ -833,13 +827,7 @@ function lib:Spawn(reference, data)
     if #active_dialogs > 0 then
         dialog:SetPoint("TOP", active_dialogs[#active_dialogs], "BOTTOM", 0, 0)
     else
-        local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
-
-        if default_dialog then
-            dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
-        else
-            dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
-        end
+        dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
     end
     active_dialogs[#active_dialogs + 1] = dialog
     dialog:Show()
