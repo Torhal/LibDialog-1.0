@@ -113,6 +113,29 @@ local editbox_heap = lib.editbox_heap
 ---- Helpers
 --------------------------------------------------------------------------------
 
+-- May 7th 2024, 1.15.2 and other clients still diverge on StaticPopup_DisplayedFrames / StaticPopup_HasDisplayedFrames
+-- so we still need both to find the last StaticPopup for anchoring
+local function _SetupAnchor(dialog)
+    local default_dialog
+    if _G.StaticPopup_DisplayedFrames then
+        default_dialog = _G.StaticPopup_DisplayedFrames[#_G.StaticPopup_DisplayedFrames]
+    elseif _G.StaticPopup_HasDisplayedFrames and _G.StaticPopup_IsLastDisplayedFrame then
+        if StaticPopup_HasDisplayedFrames() then
+            for idx = STATICPOPUP_NUMDIALOGS, 1, -1 do
+                local test_dialog = _G["StaticPopup" .. idx]
+                if StaticPopup_IsLastDisplayedFrame(test_dialog) then
+                    default_dialog = test_dialog
+                end
+            end
+        end
+    end
+    if default_dialog then
+        dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
+    else
+        dialog:SetPoint("TOP", _G.UIParent, "TOP", 0, -135)
+    end
+end
+
 local function _ProcessQueue()
     if #active_dialogs == MAX_DIALOGS then
         return
@@ -137,13 +160,7 @@ local function _RefreshDialogAnchors()
         current_dialog:ClearAllPoints()
 
         if index == 1 then
-            local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
-
-            if default_dialog then
-                current_dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
-            else
-                current_dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
-            end
+            _SetupAnchor(current_dialog)
         else
             current_dialog:SetPoint("TOP", active_dialogs[index - 1], "BOTTOM", 0, 0)
         end
@@ -833,13 +850,7 @@ function lib:Spawn(reference, data)
     if #active_dialogs > 0 then
         dialog:SetPoint("TOP", active_dialogs[#active_dialogs], "BOTTOM", 0, 0)
     else
-        local default_dialog = StaticPopup_DisplayedFrames[#StaticPopup_DisplayedFrames]
-
-        if default_dialog then
-            dialog:SetPoint("TOP", default_dialog, "BOTTOM", 0, 0)
-        else
-            dialog:SetPoint("TOP", UIParent, "TOP", 0, -135)
-        end
+        _SetupAnchor(dialog)
     end
     active_dialogs[#active_dialogs + 1] = dialog
     dialog:Show()
