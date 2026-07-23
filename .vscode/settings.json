@@ -28,6 +28,14 @@
         "~/.vscode/extensions/ketho.wow-api-0.22.1/Annotations/FrameXML"
     ],
     "stylua.targetReleaseVersion": "latest",
-    "cSpell.words": ["editbox", "editboxes", "hooksecurefunc", "onhide"],
+    "cSpell.words": [
+        "editbox",
+        "editboxes",
+        "hooksecurefunc",
+        "MAINMENU",
+        "onhide",
+        "SOUNDKIT",
+        "Torhal"
+    ],
     "Lua.diagnostics.disable": ["assign-type-mismatch"]
 }
