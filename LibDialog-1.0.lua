@@ -4,7 +4,7 @@
 
 local Version = {
     Major = "LibDialog-1.0",
-    Minor = 9,
+    Minor = 10,
 }
 
 assert(LibStub, ("%s requires LibStub"):format(Version.Major))
